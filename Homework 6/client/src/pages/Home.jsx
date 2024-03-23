@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { useQuery, gql, useSubscription } from "@apollo/client";
+import { useQuery, gql, useSubscription, useMutation } from "@apollo/client";
 import Form from "../components/Form";
 import Comments from "../components/Comments";
 
 const initialForm = {
   title: "",
-  description: "",
+  desc: "",
   date: "",
+  from: "",
+  to: "",
+  location_id: "1",
+  user_id: "",
 };
 const GET_EVENTS = gql`
   query getEvents {
@@ -34,9 +38,48 @@ const EVENT_SUBSCRIPTION = gql`
   }
 `;
 
+const NEW_EVENT_MUTATION = gql`
+  mutation addEvent($data: CreateEventInput!) {
+    createEvent(data: $data) {
+      id
+      title
+      desc
+      date
+      from
+      to
+      location_id
+      user_id
+    }
+  }
+`;
+
+const GET_ALL_USERS = gql`
+  query getAllUsers {
+    users {
+      id
+      username
+    }
+  }
+`;
+
+const GET_ALL_LOCATIONS = gql`
+  query getLocations {
+    locations {
+      id
+      name
+    }
+  }
+`;
+
 function Home() {
   const { loading, error, data, subscribeToMore } = useQuery(GET_EVENTS);
+  const { data: users } = useQuery(GET_ALL_USERS);
+  const { data: locations } = useQuery(GET_ALL_LOCATIONS);
   const [form, setForm] = useState(initialForm);
+  const [
+    createEvent,
+    { loading: eventLoading, data: eventData, error: eventError },
+  ] = useMutation(NEW_EVENT_MUTATION);
   const [events, setEvents] = useState([]);
   const handleChange = (e) => {
     e.preventDefault();
@@ -45,10 +88,16 @@ function Home() {
       [e.target.name]: e.target.value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e, values) => {
     e.preventDefault();
-    setEvents([...events, form]);
-    setForm(initialForm);
+    // setEvents([...events, form]);
+    // setForm(initialForm);
+    console.log(form);
+    await createEvent({
+      variables: {
+        data: form,
+      },
+    });
   };
 
   useEffect(() => {
@@ -73,6 +122,9 @@ function Home() {
         form={form}
         handleSubmit={handleSubmit}
         handleChange={handleChange}
+        users={users}
+        eventLoading={eventLoading}
+        locations={locations}
       />
       <Comments data={data} />
     </div>
