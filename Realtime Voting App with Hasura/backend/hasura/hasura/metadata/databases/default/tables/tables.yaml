@@ -1,0 +1,6 @@
+- "!include public_meetings.yaml"
+- "!include public_options.yaml"
+- "!include public_participants.yaml"
+- "!include public_questions.yaml"
+- "!include public_users.yaml"
+- "!include public_votes.yaml"

@@ -1,0 +1,20 @@
+actions: []
+custom_types:
+  enums: []
+  input_objects:
+    - name: RegisterInput
+    - name: LoginInput
+  objects:
+    - name: RegisterOutput
+    - name: LoginOutput
+    - name: MeOutput
+      relationships:
+        - field_mapping:
+            user_id: id
+          name: user
+          remote_table:
+            name: users
+            schema: public
+          source: default
+          type: object
+  scalars: []
